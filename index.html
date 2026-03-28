@@ -42,7 +42,7 @@ input,select{font-family:'Tajawal',sans-serif;}
 .abox{background:rgba(255,255,255,.07);backdrop-filter:blur(20px);
   border:1px solid rgba(255,255,255,.13);border-radius:24px;
   padding:28px 22px;width:100%;max-width:400px;}
-.alogo{width:80px;height:80px;object-fit:contain;display:block;margin:0 auto 14px;
+.alogo{width:100px;height:100px;object-fit:contain;display:block;margin:0 auto 14px;
   filter:drop-shadow(0 4px 18px rgba(255,255,255,.25));}
 .atitle{font-family:'Outfit',sans-serif;font-size:1.5rem;font-weight:900;
   color:#fff;text-align:center;margin-bottom:3px;}
@@ -84,7 +84,7 @@ input,select{font-family:'Tajawal',sans-serif;}
 .site-hdr{background:var(--navy);height:var(--hh);
   display:flex;align-items:center;padding:0 12px;
   position:sticky;top:0;z-index:1000;box-shadow:0 2px 16px rgba(0,0,0,.35);}
-.hlogo{height:44px;width:auto;object-fit:contain;}
+.hlogo{height:52px;width:auto;object-fit:contain;}
 .hright{margin-right:auto;display:flex;align-items:center;gap:7px;}
 .dark-btn{width:32px;height:32px;border-radius:50%;
   background:rgba(255,255,255,.1);color:#fff;font-size:.9rem;
@@ -139,7 +139,7 @@ input,select{font-family:'Tajawal',sans-serif;}
   padding:22px 18px 28px;text-align:center;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;inset:0;
   background:radial-gradient(ellipse at 70% 30%,rgba(37,99,235,.18) 0%,transparent 60%);}
-.hlogo2{width:66px;height:66px;object-fit:contain;margin:0 auto 11px;display:block;
+.hlogo2{width:82px;height:82px;object-fit:contain;margin:0 auto 11px;display:block;
   filter:drop-shadow(0 4px 14px rgba(255,255,255,.2));position:relative;}
 .htitle{font-family:'Outfit',sans-serif;font-size:1.4rem;font-weight:900;
   color:#fff;margin-bottom:6px;position:relative;}
@@ -575,6 +575,7 @@ input,select{font-family:'Tajawal',sans-serif;}
 ::-webkit-scrollbar{width:4px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.gram-loading{text-align:center;padding:30px;color:var(--muted);font-size:.84rem;}
 
 /* ══ RESPONSIVE ══ */
 @media(min-width:560px){
@@ -598,8 +599,8 @@ input,select{font-family:'Tajawal',sans-serif;}
     <div class="atitle">Niveau Pro</div>
     <div class="asub">تعلم الفرنسية احترافياً من الألف للياء</div>
     <div class="atabs">
-      <button class="atab on" onclick="swTab('login',this)">تسجيل الدخول</button>
-      <button class="atab" onclick="swTab('register',this)">حساب جديد</button>
+      <button class="atab on" id="tab-login" onclick="swTab('login',this)">تسجيل الدخول</button>
+      <button class="atab" id="tab-register" onclick="swTab('register',this)">حساب جديد</button>
     </div>
     <!-- LOGIN -->
     <div class="aform on" id="form-login">
@@ -613,7 +614,7 @@ input,select{font-family:'Tajawal',sans-serif;}
       </div>
       <div class="amsg" id="li-msg"></div>
       <button class="abtn" id="li-btn" onclick="doLogin()">دخول</button>
-      <div class="aforgot"><a href="#" onclick="doForgot(event)">نسيت كلمة المرور؟</a></div>
+      <div class="aforgot"><a href="#" onclick="showForgotForm(event)">نسيت كلمة المرور؟</a></div>
     </div>
     <!-- REGISTER -->
     <div class="aform" id="form-register">
@@ -631,6 +632,43 @@ input,select{font-family:'Tajawal',sans-serif;}
       </div>
       <div class="amsg" id="rg-msg"></div>
       <button class="abtn" id="rg-btn" onclick="doRegister()">إنشاء الحساب</button>
+    </div>
+    <!-- FORGOT PASSWORD - OTP FORM -->
+    <div class="aform" id="form-forgot">
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:2rem;margin-bottom:8px">🔑</div>
+        <p style="color:rgba(255,255,255,.7);font-size:.84rem;line-height:1.6">
+          اكتب بريدك الإلكتروني وهنبعتلك <strong style="color:#f59e0b">كود ٨ أرقام</strong> على الإيميل عشان تدخل الموقع
+        </p>
+      </div>
+      <div>
+        <label class="alabel">البريد الإلكتروني</label>
+        <input class="ainput" id="otp-e" type="email" placeholder="example@email.com" dir="ltr">
+      </div>
+      <div class="amsg" id="otp-msg"></div>
+      <button class="abtn" id="otp-btn" onclick="sendOTP()">📨 إرسال الكود</button>
+      <div class="aforgot"><a href="#" onclick="backToLogin(event)">← رجوع لتسجيل الدخول</a></div>
+    </div>
+    <!-- OTP VERIFY FORM -->
+    <div class="aform" id="form-otp">
+      <div style="text-align:center;margin-bottom:4px">
+        <div style="font-size:2rem;margin-bottom:8px">📬</div>
+        <p style="color:rgba(255,255,255,.7);font-size:.84rem;line-height:1.6">
+          تم إرسال كود ٨ أرقام على <strong style="color:#f59e0b" id="otp-email-shown"></strong>
+        </p>
+      </div>
+      <div>
+        <label class="alabel">الكود المرسل على إيميلك</label>
+        <input class="ainput" id="otp-code" type="text" placeholder="123456" dir="ltr"
+          maxlength="8" inputmode="numeric" pattern="[0-9]*"
+          style="text-align:center;font-size:1.4rem;font-weight:700;letter-spacing:6px">
+      </div>
+      <div class="amsg" id="verify-msg"></div>
+      <button class="abtn" id="verify-btn" onclick="verifyOTP()">✅ تحقق من الكود ودخول</button>
+      <div class="aforgot" style="display:flex;justify-content:space-between;margin-top:8px">
+        <a href="#" onclick="backToLogin(event)">← رجوع</a>
+        <a href="#" onclick="resendOTP(event)" id="resend-link">إعادة الإرسال</a>
+      </div>
     </div>
     <!-- VERIFY NOTICE -->
     <div class="verify-box" id="verify-box">
@@ -928,64 +966,69 @@ input,select{font-family:'Tajawal',sans-serif;}
   </div>
 </div>
 
-<!-- PATH -->
-<div class="page" id="page-path">
-  <div class="pghdr"><div class="pghico">🗺️</div><div><h2>مسارات التعلم</h2><p>اختار المسار المناسب</p></div></div>
-  <div class="pwrap">
-    <div class="ptabs">
-      <button class="ptab on" onclick="showPath('pharma',this)">💊 الصيدلاني</button>
-      <button class="ptab" onclick="showPath('beginner',this)">🌱 المبتدئ</button>
-      <button class="ptab" onclick="showPath('travel',this)">✈️ السفر</button>
-    </div>
-    <div class="psec on" id="path-pharma">
-      <div class="pintro"><div class="pico">💊</div><h3>مسار الصيدلاني</h3><p>من الأساسيات حتى الأسلوب الطبي الاحترافي</p><button class="btnp" onclick="navTo('vocab')">ابدأ</button></div>
-      <div class="psteps">
-        <div class="pstep"><div class="psn">١</div><div><div class="pst">المفردات الطبية الأساسية</div><div class="psd">تشريح + أعراض + أدوية</div></div><button class="psbtn" onclick="setFlt('anatomy')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٢</div><div><div class="pst">قواعد A1 + A2</div><div class="psd">être، avoir، الأفعال</div></div><button class="psbtn" onclick="navTo('grammar')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٣</div><div><div class="pst">مفردات الصيدلة</div><div class="psd">جرعات + مختبر + وصفات</div></div><button class="psbtn" onclick="setFlt('pharma')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٤</div><div><div class="pst">تمارين الاستشارة</div><div class="psd">جمل وحوارات طبية</div></div><button class="psbtn" onclick="navTo('exercises')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٥</div><div><div class="pst">اختبار المستوى</div><div class="psd">تحقق من وضعك</div></div><button class="psbtn" onclick="navTo('test')">اختبر</button></div>
+<!-- STATS PAGE — Smart Review -->
+<div class="page" id="page-stats">
+  <div class="pghdr"><div class="pghico">📈</div><div><h2>إحصائيات مفصّلة</h2><p>تحليل تقدمك بالأرقام</p></div></div>
+  <div class="dwrap">
+
+    <!-- Overall progress bar -->
+    <div style="background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:.8rem;font-weight:700;color:var(--text)">إجمالي التقدم</span>
+        <span style="font-family:Outfit,sans-serif;font-size:1.1rem;font-weight:900;color:var(--blue2)" id="st-pct">٠٪</span>
+      </div>
+      <div style="background:var(--border);border-radius:10px;height:12px;overflow:hidden;margin-bottom:8px">
+        <div id="st-bar" style="height:100%;background:linear-gradient(90deg,var(--blue2),var(--red2));border-radius:10px;transition:width .7s;width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)">
+        <span>تعلمت <strong id="st-learned" style="color:var(--green)">٠</strong> كلمة</span>
+        <span>متبقي <strong id="st-remain" style="color:var(--muted)">٠</strong> كلمة</span>
       </div>
     </div>
-    <div class="psec" id="path-beginner">
-      <div class="pintro"><div class="pico">🌱</div><h3>مسار المبتدئ</h3><p>من الصفر خطوة بخطوة</p><button class="btnp" onclick="navTo('grammar')">ابدأ من القواعد</button></div>
-      <div class="psteps">
-        <div class="pstep"><div class="psn">١</div><div><div class="pst">القواعد A1</div><div class="psd">être، avoir، المذكر والمؤنث</div></div><button class="psbtn" onclick="navTo('grammar')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٢</div><div><div class="pst">أول ١٠٠ كلمة</div><div class="psd">الأكثر استخداماً</div></div><button class="psbtn" onclick="navTo('vocab')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٣</div><div><div class="pst">البطاقات الذكية</div><div class="psd">راجع يومياً</div></div><button class="psbtn" onclick="navTo('flash')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٤</div><div><div class="pst">المساعد AI</div><div class="psd">يوجهك ويعرفك ناقصك</div></div><button class="psbtn" onclick="navTo('ai')">اسأل</button></div>
+
+    <!-- 4 stat boxes -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:12px">
+      <div class="dcard"><div class="dico">🎯</div><div class="dnum" id="st-level">—</div><div class="dlbl">آخر مستوى</div></div>
+      <div class="dcard"><div class="dico">🔥</div><div class="dnum" id="st-streak">٠</div><div class="dlbl">يوم متواصل</div></div>
+      <div class="dcard"><div class="dico">🃏</div><div class="dnum" id="st-rated">٠</div><div class="dlbl">بطاقة اتقيّمت</div></div>
+      <div class="dcard"><div class="dico">⭐</div><div class="dnum" id="st-mastered">٠</div><div class="dlbl">كلمة محفوظة</div></div>
+    </div>
+
+    <!-- Flash ratings bar -->
+    <div style="background:var(--card);border-radius:14px;padding:16px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:12px">
+      <p style="font-size:.76rem;font-weight:700;color:var(--text);margin-bottom:10px">تقييم البطاقات الذكية</p>
+      <div style="display:flex;border-radius:8px;overflow:hidden;height:18px;margin-bottom:9px">
+        <div id="sfb-yes" style="background:var(--green2);transition:width .5s;min-width:0"></div>
+        <div id="sfb-ok" style="background:var(--gold);transition:width .5s;min-width:0"></div>
+        <div id="sfb-no" style="background:var(--red2);transition:width .5s;min-width:0"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.72rem">
+        <span style="color:var(--green)">✅ أعرف: <strong id="sfb-yes-n">٠</strong></span>
+        <span style="color:var(--gold)">😐 تقريباً: <strong id="sfb-ok-n">٠</strong></span>
+        <span style="color:var(--red)">❌ لا أعرف: <strong id="sfb-no-n">٠</strong></span>
       </div>
     </div>
-    <div class="psec" id="path-travel">
-      <div class="pintro"><div class="pico">✈️</div><h3>مسار السفر</h3><p>للتعامل في فرنسا وكندا والمغرب</p><button class="btnp" onclick="setFlt('general')">ابدأ</button></div>
-      <div class="psteps">
-        <div class="pstep"><div class="psn">١</div><div><div class="pst">التحيات اليومية</div><div class="psd">bonjour، merci، s'il vous plaît</div></div><button class="psbtn" onclick="setFlt('general')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٢</div><div><div class="pst">في الصيدلية</div><div class="psd">جمل الطوارئ الطبية</div></div><button class="psbtn" onclick="setFlt('hospital')">ابدأ</button></div>
-        <div class="pstep"><div class="psn">٣</div><div><div class="pst">تدرب على النطق</div><div class="psd">سجّل صوتك وتحسّن</div></div><button class="psbtn" onclick="goExP()">ابدأ</button></div>
-      </div>
+
+    <!-- Per category -->
+    <p style="font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px">التقدم حسب التصنيف</p>
+    <div style="background:var(--card);border-radius:14px;padding:14px;border:1px solid var(--border);box-shadow:var(--sh);margin-bottom:12px">
+      <div id="st-cats"></div>
+    </div>
+
+    <!-- Quick actions -->
+    <p style="font-size:.74rem;font-weight:700;color:var(--muted);margin-bottom:9px;text-transform:uppercase;letter-spacing:.5px">إجراءات سريعة</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+      <button onclick="initFlash('unknown');navTo('flash')" style="padding:13px;border-radius:11px;background:var(--card);border:1.5px solid var(--red);color:var(--red);font-family:Tajawal,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">❌ راجع الصعبة</button>
+      <button onclick="navTo('test')" style="padding:13px;border-radius:11px;background:var(--navy);border:none;color:#fff;font-family:Tajawal,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">🎯 اختبر مستواك</button>
+      <button onclick="exportData()" style="padding:13px;border-radius:11px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:Tajawal,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">💾 نسخة احتياطية</button>
+      <button onclick="importData()" style="padding:13px;border-radius:11px;background:var(--card);border:1.5px solid var(--border);color:var(--text);font-family:Tajawal,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">📥 استعادة بيانات</button>
     </div>
   </div>
 </div>
 
+
 <!-- PROGRESS -->
-<div class="page" id="page-progress">
-  <div class="pghdr"><div class="pghico">📊</div><div><h2>تقدمي</h2><p>محفوظ على السيرفر</p></div></div>
-  <div class="dwrap">
-    <div class="dcards">
-      <div class="dcard"><div class="dico">📚</div><div class="dnum" id="d-total">٠</div><div class="dlbl">كلمة إجمالية</div></div>
-      <div class="dcard"><div class="dico">✅</div><div class="dnum" id="d-learned">٠</div><div class="dlbl">تعلمتها</div></div>
-      <div class="dcard"><div class="dico">📈</div><div class="dnum" id="d-pct">٠٪</div><div class="dlbl">نسبة الإتمام</div></div>
-      <div class="dcard"><div class="dico">🎯</div><div class="dnum" id="d-level">—</div><div class="dlbl">مستواك</div></div>
-    </div>
-    <div class="strow">
-      <div class="sfire">🔥</div>
-      <div><div class="snum" id="d-streak">٠</div><div class="slbl">يوم متواصل</div></div>
-      <div style="margin-right:auto;font-size:.7rem;color:#92400e;max-width:130px">واصل التعلم كل يوم!</div>
-    </div>
-    <p style="font-size:.72rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">التقدم حسب التصنيف</p>
-    <div class="cpcard" id="cpChart"></div>
-  </div>
-</div>
+
 
 <!-- BOTTOM NAV -->
 <nav class="bnav">
@@ -996,8 +1039,7 @@ input,select{font-family:'Tajawal',sans-serif;}
   <button class="nb" onclick="navTo('flash',this)"><span class="ni">🔄</span>مراجعة</button>
   <button class="nb" onclick="navTo('test',this)"><span class="ni">🎯</span>المستوى</button>
   <button class="nb" onclick="navTo('ai',this)"><span class="ni">🤖</span>AI</button>
-  <button class="nb" onclick="navTo('path',this)"><span class="ni">🗺️</span>مساراتي</button>
-  <button class="nb" onclick="navTo('progress',this)"><span class="ni">📊</span>تقدمي</button>
+  <button class="nb" onclick="navTo('stats',this)"><span class="ni">📈</span>إحصائيات</button>
 </nav>
 
 </div><!-- /main-app -->
@@ -1044,15 +1086,50 @@ const all=()=>[...BASE,...custom];
 function swTab(t,btn){
   document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('.aform').forEach(f=>f.classList.remove('on'));
-  btn.classList.add('on');
+  if(btn)btn.classList.add('on');
   $('form-'+t).classList.add('on');
   $('verify-box').classList.remove('on');
+  // Re-highlight correct tab
+  if(t==='login'&&$('tab-login'))$('tab-login').classList.add('on');
+  if(t==='register'&&$('tab-register'))$('tab-register').classList.add('on');
+}
+function showForgotForm(e){
+  if(e)e.preventDefault();
+  document.querySelectorAll('.aform').forEach(f=>f.classList.remove('on'));
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  $('form-forgot').classList.add('on');
+  // Pre-fill email if typed
+  const email=$('li-e').value.trim();
+  if(email&&$('otp-e'))$('otp-e').value=email;
+}
+function backToLogin(e){
+  if(e)e.preventDefault();
+  document.querySelectorAll('.aform').forEach(f=>f.classList.remove('on'));
+  document.querySelectorAll('.atab').forEach(b=>b.classList.remove('on'));
+  $('form-login').classList.add('on');
+  if($('tab-login'))$('tab-login').classList.add('on');
 }
 function setMsg(id,msg,tp='err'){const e=$(id);e.textContent=msg;e.className='amsg '+tp;}
-function setLoad(id,on){
-  const b=$(id);
-  if(on){b.disabled=true;b.innerHTML='جاري...<span class="spin"></span>';}
-  else{b.disabled=false;b.textContent=id==='li-btn'?'دخول':'إنشاء الحساب';}
+function setLoad(id,on,label){
+  const b=$(id);if(!b)return;
+  const defaultLabels={'li-btn':'دخول','rg-btn':'إنشاء الحساب','otp-btn':'📨 إرسال الكود','verify-btn':'✅ تحقق من الكود ودخول'};
+  if(on){b.disabled=true;b.innerHTML=(label||'جاري...')+'<span class="spin"></span>';}
+  else{b.disabled=false;b.textContent=label||defaultLabels[id]||'إرسال';}
+}
+function trErr(m){
+  if(m.includes('Invalid')||m.includes('invalid_credentials'))return '❌ بريد أو كلمة مرور خاطئة';
+  if(m.includes('already registered'))return '❌ البريد ده مسجل بالفعل';
+  if(m.includes('Password'))return '❌ كلمة المرور ٨ أحرف على الأقل';
+  if(m.includes('valid email'))return '❌ البريد غير صحيح';
+  if(m.includes('Email not confirmed'))return '❌ لازم تفعّل حسابك من الإيميل أولاً';
+  return '❌ '+m;
+}
+function setMsg(id,msg,tp='err'){const e=$(id);e.textContent=msg;e.className='amsg '+tp;}
+function setLoad(id,on,label){
+  const b=$(id);if(!b)return;
+  const def={'li-btn':'دخول','rg-btn':'إنشاء الحساب','otp-btn':'📨 إرسال الكود','verify-btn':'✅ تحقق ودخول'};
+  if(on){b.disabled=true;b.innerHTML=(label||'جاري...')+'<span class="spin"></span>';}
+  else{b.disabled=false;b.textContent=label||def[id]||'إرسال';}
 }
 function trErr(m){
   if(m.includes('Invalid')||m.includes('invalid_credentials'))return '❌ بريد أو كلمة مرور خاطئة';
@@ -1065,36 +1142,24 @@ function trErr(m){
 async function doLogin(){
   const email=$('li-e').value.trim(),pass=$('li-p').value;
   if(!email||!pass){setMsg('li-msg','من فضلك اكمل البيانات');return;}
-  setLoad('li-btn',true);
-  const{error}=await sb.auth.signInWithPassword({email,password:pass});
-  setLoad('li-btn',false);
-  if(error)setMsg('li-msg',trErr(error.message));
+  setLoad('li-btn',true,'جاري...');
+  try{
+    const{error}=await sb.auth.signInWithPassword({email,password:pass});
+    if(error)setMsg('li-msg',trErr(error.message));
+  }catch(e){
+    setMsg('li-msg','❌ تحقق من اتصالك بالإنترنت');
+  }finally{
+    setLoad('li-btn',false,'دخول');
+  }
 }
-async function doRegister(){
-  const name=$('rg-n').value.trim(),email=$('rg-e').value.trim(),pass=$('rg-p').value;
-  if(!name||!email||!pass){setMsg('rg-msg','من فضلك اكمل البيانات');return;}
-  if(pass.length<8){setMsg('rg-msg','❌ كلمة المرور ٨ أحرف على الأقل');return;}
-  setLoad('rg-btn',true);
-  const{error}=await sb.auth.signUp({
-    email,password:pass,
-    options:{data:{full_name:name}}
-  });
-  setLoad('rg-btn',false);
-  if(error){setMsg('rg-msg',trErr(error.message));return;}
-  // No email verification - auto login after register
-  setMsg('rg-msg','✅ تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...','ok');
-  setTimeout(async()=>{
-    const{error:le}=await sb.auth.signInWithPassword({email,password:pass});
-    if(le) setMsg('rg-msg','✅ الحساب اتعمل! سجّل دخولك الآن.','ok');
-  },800);
-}
+
 async function doForgot(e){
   e.preventDefault();
   const email=$('li-e').value.trim();
   if(!email){setMsg('li-msg','اكتب بريدك الإلكتروني أولاً');return;}
   const{error}=await sb.auth.resetPasswordForEmail(email,{redirectTo:window.location.href});
-  if(error)setMsg('li-msg',trErr(error.message));
-  else setMsg('li-msg','✅ تم إرسال رابط إعادة التعيين','ok');
+  if(error){setMsg('li-msg',trErr(error.message));return;}
+  setMsg('li-msg','✅ تم الإرسال — افتح إيميلك واضغط رابط إعادة التعيين','ok');
 }
 async function doLogout(){
   await syncToServer(true);
@@ -1135,7 +1200,7 @@ async function onLogin(user){
   if(av){avEl.innerHTML=`<img src="${av}" alt="">`;}
   else{avEl.textContent=name[0].toUpperCase();}
   await loadFromServer();
-  render();updateProg();updateHome();updateDash();
+  render();updateProg();updateHome();
   buildGrammar();
 }
 
@@ -1170,6 +1235,7 @@ function saveFlash(){saveLocal();schedSync();}
 async function syncToServer(force=false){
   if(!CU)return;
   if(!force&&!pending)return;
+  if(!navigator.onLine){setSync('offline');return;}
   setSync('syncing');
   try{
     const{error}=await sb.from('user_progress').upsert({
@@ -1180,12 +1246,18 @@ async function syncToServer(force=false){
       updated_at:new Date().toISOString()
     },{onConflict:'user_id'});
     if(!error){pending=false;setSync('synced');}
-    else setSync('offline');
-  }catch(e){setSync('offline');}
+    else{console.warn('Sync error:',error.message);setSync('offline');}
+  }catch(e){
+    console.warn('Sync failed:',e.message);
+    setSync('offline');
+    // Retry after 30s if online
+    setTimeout(()=>{if(navigator.onLine)syncToServer(true);},30000);
+  }
 }
 
 async function loadFromServer(){
   if(!CU)return;
+  if(!navigator.onLine){setSync('offline');return;}
   try{
     const{data,error}=await sb.from('user_progress')
       .select('learned_words,custom_words,flash_ratings')
@@ -1197,7 +1269,7 @@ async function loadFromServer(){
       Object.assign(ratings,data.flash_ratings||{});
       saveLocal();setSync('synced');
     }
-  }catch(e){setSync('offline');}
+  }catch(e){console.warn('Load failed:',e.message);setSync('offline');}
   try{
     const{data}=await sb.from('profiles').select('level').eq('id',CU.id).single();
     if(data?.level)sv('np_level',data.level);
@@ -1215,9 +1287,15 @@ function speak(text,btn){
   if(!window.speechSynthesis)return;
   window.speechSynthesis.cancel();
   const u=new SpeechSynthesisUtterance(text);
-  u.lang='fr-FR';u.rate=0.82;
+  u.lang='fr-FR';
+  u.rate=parseFloat(ld('np_rate','0.82'));
+  // Try to use French voice
+  const voices=window.speechSynthesis.getVoices();
+  const frVoice=voices.find(v=>v.lang.startsWith('fr'));
+  if(frVoice)u.voice=frVoice;
   if(btn){btn.classList.add('speaking');u.onend=u.onerror=()=>btn.classList.remove('speaking');}
-  window.speechSynthesis.speak(u);
+  // On some mobile browsers, need to be inside user gesture - handle gracefully
+  try{window.speechSynthesis.speak(u);}catch(e){if(btn)btn.classList.remove('speaking');}
 }
 
 function getGender(w){
@@ -1242,7 +1320,7 @@ function navTo(id,btn){
   });
   window.scrollTo(0,0);
   if(id==='home')updateHome();
-  if(id==='progress')updateDash();
+  if(id==='stats')updateStats();
   if(id==='flash')initFlash('all');
   if(id==='exercises')initPronun();
 }
@@ -1256,7 +1334,10 @@ function updateProg(){
   $('prog-fill').style.width=(d/t*100)+'%';
 }
 
+const PAGE_SIZE=60;
+let vPage=0;
 function render(){
+  vPage=0;
   const q=($('vsearch')||{value:''}).value.trim().toLowerCase();
   filtW=all().filter(w=>{
     return (curCat==='all'||w.cat===curCat)&&
@@ -1264,8 +1345,17 @@ function render(){
   });
   const sc=$('shown-cnt');if(sc)sc.textContent=AN(filtW.length);
   const g=$('vgrid');if(!g)return;
-  if(!filtW.length){g.innerHTML='<div class="nores"><p style="font-size:1.8rem">🔍</p><p>لا توجد نتائج</p></div>';return;}
-  g.innerHTML=filtW.map((w,i)=>{
+  if(!filtW.length){
+    g.innerHTML='<div class="nores"><p style="font-size:1.8rem">🔍</p><p>لا توجد نتائج</p></div>';
+    return;
+  }
+  renderPage(true);
+}
+
+function renderPage(reset){
+  const g=$('vgrid');if(!g)return;
+  const slice=filtW.slice(0,PAGE_SIZE*(vPage+1));
+  const html=slice.map((w,i)=>{
     const cat=getC(w.cat),done=learned.has(w.f);
     const ge=getGender(w.f);
     return `<div class="wcard${done?' done':''}${quizMode?' qcard':''}" data-i="${i}" onclick="cardClick(this)">
@@ -1283,7 +1373,15 @@ function render(){
       ${w.custom?`<button class="delbtn" data-i="${i}" onclick="event.stopPropagation();delW(this)">🗑</button>`:''}
     </div>`;
   }).join('');
+  // Add load-more button if more words exist
+  const hasMore=slice.length<filtW.length;
+  g.innerHTML=html+(hasMore?`<div style="grid-column:1/-1;text-align:center;padding:16px">
+    <button onclick="loadMore()" style="padding:10px 24px;border-radius:9px;background:var(--navy);color:#fff;border:none;font-family:Tajawal,sans-serif;font-size:.86rem;font-weight:600;cursor:pointer">
+      تحميل المزيد (${AN(filtW.length-slice.length)} كلمة متبقية)
+    </button></div>`:'');
 }
+
+function loadMore(){vPage++;renderPage(false);}
 
 function cardClick(c){
   if(quizMode&&!c.classList.contains('revealed'))return;
@@ -1981,30 +2079,52 @@ c2:[
 ]
 };
 
+const _gramBuilt={};
+const BADGES={a1:'ba1',a2:'ba2',b1:'bb1',b2:'bb2',c1:'bc1',c2:'bc2'};
+const LABELS={a1:'A1',a2:'A2',b1:'B1',b2:'B2',c1:'C1',c2:'C2'};
+
 function buildGrammar(){
-  const levs=['a1','a2','b1','b2','c1','c2'];
-  const badges={a1:'ba1',a2:'ba2',b1:'bb1',b2:'bb2',c1:'bc1',c2:'bc2'};
-  const labels={a1:'A1',a2:'A2',b1:'B1',b2:'B2',c1:'C1',c2:'C2'};
-  const gb=$('gbody');
-  if(!gb)return;
-  gb.innerHTML=levs.map(lv=>`
-    <div class="gsec${lv==='a1'?' on':''}" id="level-${lv}">
-      ${(GD[lv]||[]).map((r,i)=>`
-        <div class="rcard">
-          <div class="rhdr" onclick="toggleRule(this)">
-            <div><div class="rtitle"><span class="blv ${badges[lv]}">${labels[lv]}</span> ${r.t}</div>
-            <div class="rsub">${r.s}</div></div>
-            <span class="rtog">▼</span>
-          </div>
-          <div class="rbody">${r.b}</div>
-        </div>`).join('')}
-    </div>`).join('');
+  // Create empty containers for all levels - fast
+  const gb=$('gbody');if(!gb)return;
+  gb.innerHTML=['a1','a2','b1','b2','c1','c2'].map(lv=>
+    `<div class="gsec${lv==='a1'?' on':''}" id="level-${lv}"><div class="gram-loading">⏳ جاري التحميل...</div></div>`
+  ).join('');
+  // Build first level immediately (visible)
+  buildGrammarLevel('a1');
 }
+
+function buildGrammarLevel(lv){
+  if(_gramBuilt[lv])return;
+  _gramBuilt[lv]=true;
+  const sec=$('level-'+lv);if(!sec)return;
+  const rules=GD[lv]||[];
+  const badge=BADGES[lv],label=LABELS[lv];
+  // Use DocumentFragment for performance
+  const frag=document.createDocumentFragment();
+  rules.forEach(r=>{
+    const div=document.createElement('div');
+    div.className='rcard';
+    div.innerHTML=`<div class="rhdr" onclick="toggleRule(this)">
+      <div><div class="rtitle"><span class="blv ${badge}">${label}</span> ${r.t}</div>
+      <div class="rsub">${r.s}</div></div>
+      <span class="rtog">▼</span>
+    </div><div class="rbody">${r.b}</div>`;
+    frag.appendChild(div);
+  });
+  sec.innerHTML='';
+  sec.appendChild(frag);
+}
+
+function buildGrammar_old(){
+  const levs=['a1','a2','b1','b2','c1','c2'];
+}
+
 
 function showLevel(id,btn){
   document.querySelectorAll('.gsec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('on'));
   $('level-'+id).classList.add('on');btn.classList.add('on');
+  buildGrammarLevel(id);
 }
 function toggleRule(hdr){hdr.parentElement.classList.toggle('open');}
 function chkGP(btn){
@@ -2020,13 +2140,31 @@ function initFlash(mode){
   $('flash-active').style.display='block';$('flash-done').style.display='none';
   fflipped=false;$('fcard').classList.remove('flipped');$('frate').style.display='none';
   const ws=all();
-  if(mode==='unknown')fdeck=ws.filter(w=>(ratings[w.f]||0)<1).sort(()=>Math.random()-.5);
-  else if(mode==='learned')fdeck=ws.filter(w=>learned.has(w.f)).sort(()=>Math.random()-.5);
-  else fdeck=[...ws].sort(()=>Math.random()-.5).slice(0,50);
+  if(mode==='unknown'){
+    // SRS: unknown first, then maybe words
+    const unknown=ws.filter(w=>(ratings[w.f]||0)===0);
+    const maybe=ws.filter(w=>(ratings[w.f]||0)===1).filter(()=>Math.random()<0.5);
+    fdeck=[...unknown,...maybe].sort(()=>Math.random()-.5);
+  } else if(mode==='learned'){
+    fdeck=ws.filter(w=>learned.has(w.f)).sort(()=>Math.random()-.5);
+  } else {
+    // Smart random: weight by difficulty
+    const hard=ws.filter(w=>(ratings[w.f]||0)===0);
+    const med=ws.filter(w=>(ratings[w.f]||0)===1);
+    const easy=ws.filter(w=>(ratings[w.f]||0)>=2);
+    // Include all hard, 60% med, 20% easy
+    const pick=med.filter(()=>Math.random()<0.6);
+    const pickE=easy.filter(()=>Math.random()<0.2);
+    fdeck=[...hard,...pick,...pickE].sort(()=>Math.random()-.5).slice(0,50);
+    if(fdeck.length<20) fdeck=[...ws].sort(()=>Math.random()-.5).slice(0,50);
+  }
   if(!fdeck.length)fdeck=[...ws].sort(()=>Math.random()-.5).slice(0,30);
-  fidx=0;$('ftitle').textContent=mode==='unknown'?'الكلمات الصعبة':mode==='learned'?'المتعلمة':'عشوائي';
+  fidx=0;
+  const titles={unknown:'الكلمات الصعبة 🎯',learned:'الكلمات المتعلمة ✅',all:'مراجعة ذكية 🧠'};
+  $('ftitle').textContent=titles[mode]||'مراجعة ذكية 🧠';
   showFCard();
 }
+
 function showFCard(){
   if(fidx>=fdeck.length){
     $('flash-active').style.display='none';$('flash-done').style.display='block';
@@ -2188,8 +2326,13 @@ function renderQ(){
   $('trans-box').textContent=q.tr||q.q;
   // Show translate button always
   var tb=document.querySelector('.trans-btn');if(tb)tb.style.display='flex';
-  $('trans-btn').style.display='flex';
   TS.sel=null;
+  window._curQ=q.q;
+  // Reset speak button style
+  const sab=$('speak-after');
+  if(sab){sab.style.display='none';sab.style.background='';sab.style.color='';
+    sab.style.border='';sab.style.padding='';sab.style.borderRadius='';
+    sab.style.fontWeight='';sab.style.width='';sab.style.justifyContent='';}
   $('topts').innerHTML=q.opts.map((o,i)=>
     `<button class="topt" onclick="selA(${i})" dir="${/[\u0600-\u06FF]/.test(o)?'rtl':'ltr'}">${o}</button>`
   ).join('');
@@ -2207,17 +2350,35 @@ function selA(idx){
     if(i===q.ans)b.classList.add('correct');
     else if(i===idx&&!ok)b.classList.add('wrong');
   });
-  // Show speak button after answer
-  $('speak-after').style.display='flex';
+  // Show speak button after answer - prominent
+  const sab=$('speak-after');
+  sab.style.display='flex';
+  sab.style.background='var(--blue2)';
+  sab.style.color='#fff';
+  sab.style.border='none';
+  sab.style.padding='10px 18px';
+  sab.style.borderRadius='10px';
+  sab.style.fontWeight='700';
+  sab.style.fontSize='.85rem';
+  sab.style.width='100%';
+  sab.style.justifyContent='center';
+  sab.style.marginBottom='10px';
+  // Auto-show translation after answer
+  const tb=$('trans-box');
+  if(tb){tb.classList.add('on');}
+  // Show feedback
   $('tfb').style.display='block';
   $('fbico').textContent=ok?'✅':'❌';
   $('fbtxt').textContent=ok?'إجابة صحيحة! 🎉':'إجابة خاطئة';
   $('fbtxt').style.color=ok?'var(--green)':'var(--red)';
-  $('fbexp').textContent=ok?'':'الإجابة الصحيحة: '+q.opts[q.ans];
-  // Auto speak the full sentence after answer
-  setTimeout(()=>speak(TQ[TS.cur].q,null),300);
+  $('fbexp').textContent=ok?q.tr||'':'الإجابة الصحيحة: '+q.opts[q.ans];
+  // Store current Q text for speak button
+  window._curQ=q.q;
 }
-function speakAfter(){speak(TQ[TS.cur].q,null);}
+function speakAfter(){
+  const text=window._curQ||TQ[TS.cur]?.q||'';
+  if(text)speak(text,document.getElementById('speak-after'));
+}
 function nextQ(){TS.cur++;if(TS.cur>=TQ.length)showResult();else renderQ();}
 function showResult(){
   $('tactive').style.display='none';$('tresult').style.display='block';
@@ -2375,6 +2536,176 @@ function appInit(){
 // Sync on hide/close
 document.addEventListener('visibilitychange',()=>{if(document.hidden)syncToServer(true);});
 window.addEventListener('beforeunload',()=>syncToServer(true));
+window.addEventListener('online',()=>{setSync('syncing');if(pending)syncToServer(true);});
+window.addEventListener('offline',()=>setSync('offline'));
+// Handle password reset from email link
+async function handleAuthRedirect(){
+  try{
+    const hash=window.location.hash;
+    if(!hash)return;
+    if(hash.includes('type=recovery')){
+      const{data}=await sb.auth.getSession();
+      if(data?.session) showResetForm();
+    }
+  }catch(err){}
+}
+function showResetForm(){
+  const box=document.querySelector('.abox');if(!box)return;
+  box.innerHTML=`<img class="alogo" src="${LOGO}" alt="Niveau Pro">
+    <div class="atitle" style="font-family:Outfit,sans-serif;font-size:1.3rem;font-weight:900;color:#fff;text-align:center;margin-bottom:8px">كلمة مرور جديدة</div>
+    <div class="asub">اكتب كلمة مرور جديدة لحسابك</div>
+    <div style="display:flex;flex-direction:column;gap:11px;margin-top:16px">
+      <div><label class="alabel">كلمة المرور الجديدة</label>
+      <input class="ainput" id="new-p1" type="password" placeholder="٨ أحرف على الأقل" dir="ltr"></div>
+      <div><label class="alabel">تأكيد كلمة المرور</label>
+      <input class="ainput" id="new-p2" type="password" placeholder="••••••••" dir="ltr"></div>
+      <div class="amsg" id="reset-msg"></div>
+      <button class="abtn" onclick="doPasswordReset()">💾 حفظ كلمة المرور</button>
+    </div>`;
+}
+async function doPasswordReset(){
+  const p1=document.getElementById('new-p1')?.value||'';
+  const p2=document.getElementById('new-p2')?.value||'';
+  const msg=document.getElementById('reset-msg');
+  if(p1.length<8){if(msg){msg.textContent='كلمة المرور ٨ أحرف على الأقل';msg.className='amsg err';}return;}
+  if(p1!==p2){if(msg){msg.textContent='كلمتا المرور مش متطابقتين';msg.className='amsg err';}return;}
+  const{error}=await sb.auth.updateUser({password:p1});
+  if(error){if(msg){msg.textContent='خطأ: '+error.message;msg.className='amsg err';}return;}
+  if(msg){msg.textContent='✅ تم تغيير كلمة المرور! سيتم تسجيل دخولك...';msg.className='amsg ok';}
+  setTimeout(()=>window.location.reload(),2000);
+}
+handleAuthRedirect();
+
+// ══ OTP / FORGOT PASSWORD ══
+let _otpEmail='';
+
+async function sendOTP(){
+  const email=$('otp-e').value.trim();
+  if(!email){setOtpMsg('otp-msg','من فضلك اكتب بريدك الإلكتروني','err');return;}
+  setLoad('otp-btn',true,'📨 جاري الإرسال...');
+  const{error}=await sb.auth.signInWithOtp({
+    email,
+    options:{shouldCreateUser:false}
+  });
+  setLoad('otp-btn',false,'📨 إرسال الكود');
+  if(error){
+    // If user not found, show friendly message
+    if(error.message.includes('not found')||error.message.includes('Invalid')){
+      setOtpMsg('otp-msg','❌ البريد ده مش مسجل في الموقع','err');
+    } else {
+      setOtpMsg('otp-msg','❌ '+error.message,'err');
+    }
+    return;
+  }
+  _otpEmail=email;
+  $('otp-email-shown').textContent=email;
+  // Show OTP verify form
+  document.querySelectorAll('.aform').forEach(f=>f.classList.remove('on'));
+  $('form-otp').classList.add('on');
+  setTimeout(()=>$('otp-code')?.focus(),300);
+  // Start resend countdown
+  startResendTimer();
+}
+
+async function verifyOTP(){
+  const code=($('otp-code').value||'').trim().replace(/\s/g,'');
+  if(code.length!==8||!/^\d+$/.test(code)){
+    setOtpMsg('verify-msg','الكود ٨ أرقام بالضبط','err');return;
+  }
+  setLoad('verify-btn',true,'جاري التحقق...');
+  // Try both OTP types (email and magiclink share same implementation)
+  let lastErr=null;
+  for(const t of ['email','magiclink','signup']){
+    const{error}=await sb.auth.verifyOtp({email:_otpEmail,token:code,type:t});
+    if(!error){setLoad('verify-btn',false,'✅ تحقق من الكود ودخول');return;}
+    lastErr=error;
+  }
+  setLoad('verify-btn',false,'✅ تحقق من الكود ودخول');
+  setOtpMsg('verify-msg','❌ الكود غلط أو انتهت صلاحيته — اضغط "إعادة الإرسال"','err');
+}
+
+async function resendOTP(e){
+  if(e)e.preventDefault();
+  if(!_otpEmail)return;
+  const{error}=await sb.auth.signInWithOtp({
+    email:_otpEmail,
+    options:{shouldCreateUser:false}
+  });
+  if(!error){
+    setOtpMsg('verify-msg','✅ تم إرسال كود جديد على إيميلك','ok');
+    startResendTimer();
+  }
+}
+
+function startResendTimer(){
+  const link=$('resend-link');if(!link)return;
+  link.style.pointerEvents='none';link.style.opacity='0.4';
+  let t=60;
+  link.textContent=`إعادة الإرسال (${t}ث)`;
+  const iv=setInterval(()=>{
+    t--;
+    if(t<=0){
+      clearInterval(iv);
+      link.textContent='إعادة الإرسال';
+      link.style.pointerEvents='';link.style.opacity='';
+    } else {
+      link.textContent=`إعادة الإرسال (${t}ث)`;
+    }
+  },1000);
+}
+
+function setOtpMsg(id,msg,tp){
+  const el=$(id);if(!el)return;
+  el.textContent=msg;el.className='amsg '+(tp||'err');
+}
+
+function setLoad(id,on,label){
+  const b=$(id);if(!b)return;
+  if(on){b.disabled=true;b.innerHTML=label+'<span class="spin"></span>';}
+  else{b.disabled=false;b.textContent=label||b.dataset.label||'إرسال';}
+}
+
+
+async function doForgot(e){if(e)e.preventDefault();showForgotForm();}
+
+function updateStats(){
+  const total=all().length,done=learned.size,pct=total?Math.round(done/total*100):0;
+  const el=id=>document.getElementById(id);
+  if(el('st-learned'))el('st-learned').textContent=AN(done);
+  if(el('st-remain'))el('st-remain').textContent=AN(total-done);
+  if(el('st-level'))el('st-level').textContent=ld('np_level','—');
+  if(el('st-pct'))el('st-pct').textContent=AN(pct)+'٪';
+  if(el('st-bar'))el('st-bar').style.width=pct+'%';
+  if(el('st-streak'))el('st-streak').textContent=AN(parseInt(ld('np_streak','0')));
+  // Flash ratings
+  const rvals=Object.values(ratings);
+  const ryes=rvals.filter(v=>v>=2).length;
+  const rok=rvals.filter(v=>v===1).length;
+  const rno=rvals.filter(v=>v===0).length;
+  const rtotal=rvals.length||1;
+  if(el('st-rated'))el('st-rated').textContent=AN(rvals.length);
+  if(el('st-mastered'))el('st-mastered').textContent=AN(ryes);
+  if(el('sfb-yes'))el('sfb-yes').style.width=(ryes/rtotal*100)+'%';
+  if(el('sfb-ok'))el('sfb-ok').style.width=(rok/rtotal*100)+'%';
+  if(el('sfb-no'))el('sfb-no').style.width=(rno/rtotal*100)+'%';
+  if(el('sfb-yes-n'))el('sfb-yes-n').textContent=AN(ryes);
+  if(el('sfb-ok-n'))el('sfb-ok-n').textContent=AN(rok);
+  if(el('sfb-no-n'))el('sfb-no-n').textContent=AN(rno);
+  // Per category
+  const cc={},cd={};
+  all().forEach(w=>{cc[w.cat]=(cc[w.cat]||0)+1;if(learned.has(w.f))cd[w.cat]=(cd[w.cat]||0)+1;});
+  const catsEl=el('st-cats');
+  if(catsEl){
+    catsEl.innerHTML=Object.entries(CATS).map(([k,cat])=>{
+      const t=cc[k]||0,d=cd[k]||0,p=t?Math.round(d/t*100):0;
+      return `<div class="cprow">
+        <div class="cplbl">${cat.l}</div>
+        <div class="cpbw"><div class="cpbf" style="width:${p}%"></div></div>
+        <div class="cppct">${AN(d)}/${AN(t)}</div>
+      </div>`;
+    }).join('');
+  }
+}
 </script>
 </body>
 </html>
