@@ -699,7 +699,7 @@ input,select{font-family:'Tajawal',sans-serif;}
 <!-- USER DROPDOWN -->
 <div class="udd" id="udd">
   <div class="udhdr"><div class="udname" id="udname">—</div><div class="udemail" id="udemail">—</div></div>
-  <div class="uditem" onclick="navTo('progress');closeDD()">📊 تقدمي</div>
+  <div class="uditem" onclick="navTo('stats');closeDD()">📈 إحصائياتي</div>
   <div class="uditem" onclick="exportData();closeDD()">💾 نسخة احتياطية</div>
   <div class="uditem" onclick="importData();closeDD()">📥 استعادة بيانات</div>
   <div class="uditem red" onclick="doLogout()">🚪 تسجيل الخروج</div>
@@ -727,7 +727,7 @@ input,select{font-family:'Tajawal',sans-serif;}
     <div class="fcard" onclick="navTo('vocab')"><div class="fico">📚</div><div class="fname">٣٥٠٠+ كلمة</div><div class="fdesc">مع نطق ومذكر/مؤنث</div><span class="fbadge bcore">الأساسي</span></div>
     <div class="fcard" onclick="navTo('grammar')"><div class="fico">📖</div><div class="fname">قواعد A1→C2</div><div class="fdesc">٣٠+ درس مع تمارين</div><span class="fbadge bcore">الأساسي</span></div>
     <div class="fcard" onclick="navTo('flash')"><div class="fico">🔄</div><div class="fname">بطاقات ذكية</div><div class="fdesc">مراجعة متكررة</div><span class="fbadge bhot">مميز</span></div>
-    <div class="fcard" onclick="navTo('exercises')"><div class="fico">✍️</div><div class="fname">تمارين + نطق</div><div class="fdesc">ملء فراغات وترجمة</div><span class="fbadge bnew">جديد</span></div>
+    <div class="fcard" onclick="navTo('exercises')"><div class="fico">✍️</div><div class="fname">تمارين</div><div class="fdesc">ملء فراغات وترجمة</div><span class="fbadge bnew">جديد</span></div>
     <div class="fcard" onclick="navTo('test')"><div class="fico">🎯</div><div class="fname">تحديد المستوى</div><div class="fdesc">٤٠ سؤال مع ترجمة</div><span class="fbadge bhot">مميز</span></div>
     <div class="fcard" onclick="navTo('ai')"><div class="fico">🤖</div><div class="fname">مساعد AI</div><div class="fdesc">يحدد ناقصك ويوجهك</div><span class="fbadge bai">AI</span></div>
   </div>
@@ -844,7 +844,7 @@ input,select{font-family:'Tajawal',sans-serif;}
     <div class="etabs">
       <button class="etab on" onclick="showExTab('fill',this)">ملء الفراغات</button>
       <button class="etab" onclick="showExTab('translate',this)">ترجمة</button>
-      <button class="etab" onclick="showExTab('pronun',this)">🎙️ النطق</button>
+      <button class="etab" onclick="showExTab('mcq',this)">🧠 أسئلة MCQ</button>
     </div>
     <div class="esec on" id="ex-fill">
       <div class="ecard"><div class="enum">تمرين ١</div><div class="esent">Le médecin <input class="blank" data-ans="examine" placeholder="___"> le patient chaque matin.</div><div class="ehint">💡 يكشف — examiner (vous)</div><button class="echkbtn" onclick="chkBlank(this)">تحقق</button></div>
@@ -875,14 +875,10 @@ input,select{font-family:'Tajawal',sans-serif;}
       <div class="trcard"><div class="enum">ترجمة ٧</div><div class="trprompt">ترجم للفرنسية:</div><div class="trar">أنا بعاني من السكر من ١٠ سنين.</div><input class="trinp" dir="ltr" data-ans="Je souffre du diabète depuis dix ans." placeholder="اكتب ترجمتك..."><button class="echkbtn" onclick="chkTrans(this)">تحقق</button><div class="trans"></div></div>
       <div class="trcard"><div class="enum">ترجمة ٨</div><div class="trprompt">ترجم للفرنسية:</div><div class="trar">الطبيب صف مضادات حيوية.</div><input class="trinp" dir="ltr" data-ans="Le médecin a prescrit des antibiotiques." placeholder="اكتب ترجمتك..."><button class="echkbtn" onclick="chkTrans(this)">تحقق</button><div class="trans"></div></div>
     </div>
-    </div>
-    <div class="esec" id="ex-pronun">
-      <p style="font-size:.76rem;color:var(--muted);margin-bottom:11px;text-align:center">استمع ثم سجّل نطقك</p>
-      <div id="pronun-cards"></div>
+    <div class="esec" id="ex-mcq">
+      <div id="mcq-container"></div>
     </div>
   </div>
-</div>
-
 <!-- TEST -->
 <div class="page" id="page-test">
   <div class="twrap">
@@ -1124,13 +1120,7 @@ function trErr(m){
   if(m.includes('Email not confirmed'))return '❌ لازم تفعّل حسابك من الإيميل أولاً';
   return '❌ '+m;
 }
-function setMsg(id,msg,tp='err'){const e=$(id);e.textContent=msg;e.className='amsg '+tp;}
-function setLoad(id,on,label){
-  const b=$(id);if(!b)return;
-  const def={'li-btn':'دخول','rg-btn':'إنشاء الحساب','otp-btn':'📨 إرسال الكود','verify-btn':'✅ تحقق ودخول'};
-  if(on){b.disabled=true;b.innerHTML=(label||'جاري...')+'<span class="spin"></span>';}
-  else{b.disabled=false;b.textContent=label||def[id]||'إرسال';}
-}
+
 function trErr(m){
   if(m.includes('Invalid')||m.includes('invalid_credentials'))return '❌ بريد أو كلمة مرور خاطئة';
   if(m.includes('already registered'))return '❌ البريد ده مسجل بالفعل';
@@ -1162,20 +1152,34 @@ async function doForgot(e){
   setMsg('li-msg','✅ تم الإرسال — افتح إيميلك واضغط رابط إعادة التعيين','ok');
 }
 async function doLogout(){
-  await syncToServer(true);
-  await sb.auth.signOut();
+  // Cancel any pending sync first
+  clearTimeout(syncTimer);
+  pending=false;
+  // Set sync to idle so no "syncing" badge
+  setSync('synced');
+  // Store user ref then null it immediately to block any new syncs
+  const userRef=CU;
   CU=null;
+  // Show auth immediately
+  $('main-app').style.display='none';
+  $('auth-screen').classList.remove('hidden');
+  closeDD();
+  // Reset all state
   learned=new Set();custom=[];ratings={};
   ['np_l','np_c','np_r','np_level','np_streak','np_lastday'].forEach(k=>{
     try{localStorage.removeItem(k);}catch(e){}
   });
-  $('main-app').style.display='none';
-  $('auth-screen').classList.remove('hidden');
-  closeDD();
-  $('li-e').value='';$('li-p').value='';
-  $('rg-n').value='';$('rg-e').value='';$('rg-p').value='';
-  $('verify-box').classList.remove('on');
-  ['li-msg','rg-msg'].forEach(id=>{$(id).textContent='';$(id).className='amsg';});
+  // Reset forms
+  ['li-e','li-p','rg-n','rg-e','rg-p'].forEach(id=>{const e=$(id);if(e)e.value='';});
+  ['li-msg','rg-msg'].forEach(id=>{const e=$(id);if(e){e.textContent='';e.className='amsg';}});
+  $('verify-box')?.classList.remove('on');
+  // Reset nav to home
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('on'));
+  document.querySelector(".nb")?.classList.add('on');
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  $('page-home')?.classList.add('on');
+  // Sign out from Supabase silently
+  try{await sb.auth.signOut();}catch(e){}
 }
 
 // Auth state listener
@@ -1199,9 +1203,34 @@ async function onLogin(user){
   const avEl=$('uav');
   if(av){avEl.innerHTML=`<img src="${av}" alt="">`;}
   else{avEl.textContent=name[0].toUpperCase();}
+  // Make sure DB rows exist before loading
+  await ensureUserRows(user);
   await loadFromServer();
   render();updateProg();updateHome();
   buildGrammar();
+  // Force vocab grid to be ready
+  setTimeout(()=>{if(filtW.length===0)render();},500);
+}
+
+async function ensureUserRows(user){
+  try{
+    // Ensure profile row
+    const{error:pe}=await sb.from('profiles').upsert({
+      id:user.id,
+      email:user.email,
+      full_name:user.user_metadata?.full_name||user.email.split('@')[0]
+    },{onConflict:'id',ignoreDuplicates:true});
+    if(pe)console.warn('Profile upsert:',pe.message);
+    // Ensure progress row
+    const{error:pre}=await sb.from('user_progress').upsert({
+      user_id:user.id,
+      learned_words:[],
+      custom_words:[],
+      flash_ratings:{},
+      updated_at:new Date().toISOString()
+    },{onConflict:'user_id',ignoreDuplicates:true});
+    if(pre)console.warn('Progress upsert:',pre.message);
+  }catch(e){console.warn('ensureUserRows:',e.message);}
 }
 
 // ══════════ SYNC ══════════
@@ -1238,20 +1267,38 @@ async function syncToServer(force=false){
   if(!navigator.onLine){setSync('offline');return;}
   setSync('syncing');
   try{
-    const{error}=await sb.from('user_progress').upsert({
+    // Try upsert first
+    const{error:e1}=await sb.from('user_progress').upsert({
       user_id:CU.id,
       learned_words:[...learned],
       custom_words:custom,
       flash_ratings:ratings,
       updated_at:new Date().toISOString()
     },{onConflict:'user_id'});
-    if(!error){pending=false;setSync('synced');}
-    else{console.warn('Sync error:',error.message);setSync('offline');}
+    if(!e1){pending=false;setSync('synced');return;}
+
+    // Upsert failed → try update
+    const{error:e2}=await sb.from('user_progress').update({
+      learned_words:[...learned],
+      custom_words:custom,
+      flash_ratings:ratings,
+      updated_at:new Date().toISOString()
+    }).eq('user_id',CU.id);
+    if(!e2){pending=false;setSync('synced');return;}
+
+    // Update failed → try insert (first time user)
+    const{error:e3}=await sb.from('user_progress').insert({
+      user_id:CU.id,
+      learned_words:[...learned],
+      custom_words:custom,
+      flash_ratings:ratings
+    });
+    if(!e3){pending=false;setSync('synced');}
+    else{console.warn('All sync methods failed:',e3.message);setSync('offline');}
   }catch(e){
-    console.warn('Sync failed:',e.message);
+    console.warn('Sync exception:',e.message);
     setSync('offline');
-    // Retry after 30s if online
-    setTimeout(()=>{if(navigator.onLine)syncToServer(true);},30000);
+    setTimeout(()=>{if(CU&&navigator.onLine)syncToServer(true);},30000);
   }
 }
 
@@ -1322,7 +1369,9 @@ function navTo(id,btn){
   if(id==='home')updateHome();
   if(id==='stats')updateStats();
   if(id==='flash')initFlash('all');
-  if(id==='exercises')initPronun();
+  if(id==='exercises')initMCQ();
+  if(id==='vocab'){render();updateProg();}
+  if(id==='grammar'&&$('gbody')&&!$('gbody').innerHTML.trim())buildGrammar();
 }
 
 // ══════════ VOCAB ══════════
@@ -1335,14 +1384,19 @@ function updateProg(){
 }
 
 const PAGE_SIZE=60;
-let vPage=0;
+let vPage=0,_rt=null;
+
 function render(){
+  clearTimeout(_rt);
+  _rt=setTimeout(_doRender,150);
+}
+function _doRender(){
   vPage=0;
+  const ws=all();
+  if(!ws||!ws.length)return; // data not ready
   const q=($('vsearch')||{value:''}).value.trim().toLowerCase();
-  filtW=all().filter(w=>{
-    return (curCat==='all'||w.cat===curCat)&&
-           (!q||w.f.toLowerCase().includes(q)||w.a.includes(q));
-  });
+  filtW=ws.filter(w=>(curCat==='all'||w.cat===curCat)&&
+    (!q||w.f.toLowerCase().includes(q)||w.a.includes(q)));
   const sc=$('shown-cnt');if(sc)sc.textContent=AN(filtW.length);
   const g=$('vgrid');if(!g)return;
   if(!filtW.length){
@@ -1355,30 +1409,34 @@ function render(){
 function renderPage(reset){
   const g=$('vgrid');if(!g)return;
   const slice=filtW.slice(0,PAGE_SIZE*(vPage+1));
-  const html=slice.map((w,i)=>{
+  // Build HTML efficiently
+  const parts=[];
+  for(let i=0;i<slice.length;i++){
+    const w=slice[i];
     const cat=getC(w.cat),done=learned.has(w.f);
     const ge=getGender(w.f);
-    return `<div class="wcard${done?' done':''}${quizMode?' qcard':''}" data-i="${i}" onclick="cardClick(this)">
-      <div class="wctop">
-        <div class="wcmain">
-          <span class="wcatag" style="background:${cat.b};color:${cat.c}">${cat.l}</span>${w.custom?'<span class="wctag">مضاف</span>':''}
-          <div class="wfr">${w.f}</div>
-          ${ge?`<div class="wgen ${ge.cls}">${ge.l}</div>`:''}
-          <div class="war">${w.a}</div>
-          ${quizMode?`<span class="rbtn" onclick="event.stopPropagation();this.closest('.wcard').classList.add('revealed')">اكشف</span>`:''}
-          ${w.ex?`<div class="wex">${w.ex}</div>`:''}
-        </div>
-        <button class="wsnd" data-i="${i}" onclick="event.stopPropagation();speakW(this)">🔊</button>
-      </div>
-      ${w.custom?`<button class="delbtn" data-i="${i}" onclick="event.stopPropagation();delW(this)">🗑</button>`:''}
-    </div>`;
-  }).join('');
-  // Add load-more button if more words exist
+    parts.push(
+      `<div class="wcard${done?' done':''}${quizMode?' qcard':''}" data-i="${i}" onclick="cardClick(this)">` +
+      `<div class="wctop"><div class="wcmain">` +
+      `<span class="wcatag" style="background:${cat.b};color:${cat.c}">${cat.l}</span>` +
+      (w.custom?'<span class="wctag">مضاف</span>':'') +
+      `<div class="wfr">${w.f}</div>` +
+      (ge?`<div class="wgen ${ge.cls}">${ge.l}</div>`:'') +
+      `<div class="war">${w.a}</div>` +
+      (quizMode?`<span class="rbtn" onclick="event.stopPropagation();this.closest('.wcard').classList.add('revealed')">اكشف</span>`:'') +
+      (w.ex?`<div class="wex">${w.ex}</div>`:'') +
+      `</div><button class="wsnd" data-i="${i}" onclick="event.stopPropagation();speakW(this)">🔊</button></div>` +
+      (w.custom?`<button class="delbtn" data-i="${i}" onclick="event.stopPropagation();delW(this)">🗑</button>`:'') +
+      '</div>'
+    );
+  }
   const hasMore=slice.length<filtW.length;
-  g.innerHTML=html+(hasMore?`<div style="grid-column:1/-1;text-align:center;padding:16px">
-    <button onclick="loadMore()" style="padding:10px 24px;border-radius:9px;background:var(--navy);color:#fff;border:none;font-family:Tajawal,sans-serif;font-size:.86rem;font-weight:600;cursor:pointer">
-      تحميل المزيد (${AN(filtW.length-slice.length)} كلمة متبقية)
-    </button></div>`:'');
+  if(hasMore) parts.push(
+    `<div style="grid-column:1/-1;text-align:center;padding:16px">` +
+    `<button onclick="loadMore()" style="padding:10px 24px;border-radius:9px;background:var(--navy);color:#fff;border:none;font-family:Tajawal,sans-serif;font-size:.86rem;font-weight:600;cursor:pointer">` +
+    `تحميل المزيد (${AN(filtW.length-slice.length)} كلمة متبقية)</button></div>`
+  );
+  g.innerHTML=parts.join('');
 }
 
 function loadMore(){vPage++;renderPage(false);}
@@ -2099,20 +2157,23 @@ function buildGrammarLevel(lv){
   const sec=$('level-'+lv);if(!sec)return;
   const rules=GD[lv]||[];
   const badge=BADGES[lv],label=LABELS[lv];
-  // Use DocumentFragment for performance
-  const frag=document.createDocumentFragment();
-  rules.forEach(r=>{
-    const div=document.createElement('div');
-    div.className='rcard';
-    div.innerHTML=`<div class="rhdr" onclick="toggleRule(this)">
-      <div><div class="rtitle"><span class="blv ${badge}">${label}</span> ${r.t}</div>
-      <div class="rsub">${r.s}</div></div>
-      <span class="rtog">▼</span>
-    </div><div class="rbody">${r.b}</div>`;
-    frag.appendChild(div);
-  });
+  // Show loading briefly
   sec.innerHTML='';
-  sec.appendChild(frag);
+  // Build in next animation frame to not block UI
+  requestAnimationFrame(()=>{
+    const frag=document.createDocumentFragment();
+    rules.forEach(r=>{
+      const div=document.createElement('div');
+      div.className='rcard';
+      div.innerHTML='<div class="rhdr" onclick="toggleRule(this)">'+
+        '<div><div class="rtitle"><span class="blv '+badge+'">'+label+'</span> '+r.t+'</div>'+
+        '<div class="rsub">'+r.s+'</div></div>'+
+        '<span class="rtog">▼</span></div>'+
+        '<div class="rbody">'+r.b+'</div>';
+      frag.appendChild(div);
+    });
+    sec.appendChild(frag);
+  });
 }
 
 function buildGrammar_old(){
@@ -2194,7 +2255,7 @@ function showExTab(id,btn){
   document.querySelectorAll('.esec').forEach(s=>s.classList.remove('on'));
   document.querySelectorAll('.etab').forEach(b=>b.classList.remove('on'));
   $('ex-'+id).classList.add('on');btn.classList.add('on');
-  if(id==='pronun')initPronun();
+  if(id==='mcq')initMCQ();
 }
 function chkBlank(btn){
   const c=btn.closest('.ecard'),inp=c.querySelector('.blank');
@@ -2212,53 +2273,9 @@ function chkTrans(btn){
   d.textContent=ok?'✅ ممتاز! '+inp.dataset.ans:'💡 الإجابة الصحيحة: '+inp.dataset.ans;
 }
 
-const PWORDS=[
-  {f:"le médecin",a:"الطبيب"},{f:"la pharmacie",a:"الصيدلية"},
-  {f:"l'ordonnance",a:"الروشتة"},{f:"le comprimé",a:"القرص"},
-  {f:"la douleur",a:"الألم"},{f:"la fièvre",a:"الحمى"},
-  {f:"l'hôpital",a:"المستشفى"},{f:"le traitement",a:"العلاج"},
-  {f:"les urgences",a:"الطوارئ"},{f:"l'antibiotique",a:"المضاد الحيوي"},
-  {f:"la tension artérielle",a:"ضغط الدم"},{f:"le diagnostic",a:"التشخيص"},
-  {f:"l'allergie",a:"الحساسية"},{f:"le chirurgien",a:"الجراح"},
-  {f:"la prescription",a:"الروشتة / الوصفة الطبية"},{f:"les effets secondaires",a:"الأعراض الجانبية"},
-  {f:"le laboratoire",a:"المختبر"},{f:"l'infirmière",a:"الممرضة"},
-];
-function initPronun(){
-  const c=$('pronun-cards');if(!c)return;
-  c.innerHTML=PWORDS.map((w,i)=>`
-    <div class="pcard">
-      <div class="pword">${w.f}</div>
-      <div class="ptrans">${w.a}</div>
-      <div class="pbtns">
-        <button class="pbtn pbtnl" onclick="speak('${w.f.replace(/'/g,"\\'")}',null)">🔊 استمع</button>
-        <button class="pbtn pbtnr" data-w="${w.f.replace(/'/g,'&apos;')}" onclick="startRec(this)">🎙️ سجّل</button>
-      </div>
-      <div class="pres" id="pres-${i}"></div>
-    </div>`).join('');
-}
-function startRec(btn){
-  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
-    btn.closest('.pcard').querySelector('.pres').innerHTML='<span style="color:var(--red)">⚠️ المتصفح لا يدعم التسجيل</span>';
-    return;
-  }
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  const r=new SR();r.lang='fr-FR';r.continuous=false;r.interimResults=false;
-  btn.classList.add('rec');btn.textContent='🔴 يسمع...';
-  r.onresult=e=>{
-    const said=e.results[0][0].transcript.toLowerCase().trim();
-    const target=btn.dataset.w.toLowerCase().replace(/l'|le |la |les /g,'').trim();
-    const ok=said.includes(target.split(' ')[0])||target.includes(said.split(' ')[0]);
-    const cards=$('pronun-cards').querySelectorAll('.pcard');
-    const idx=Array.from(cards).indexOf(btn.closest('.pcard'));
-    const res=$('pres-'+idx);
-    res.className='pres '+(ok?'great':'try');
-    res.textContent=ok?'✅ ممتاز! نطقك: "'+e.results[0][0].transcript+'"':'❌ سمعت: "'+e.results[0][0].transcript+'" — حاول تاني';
-    btn.classList.remove('rec');btn.textContent='🎙️ سجّل';
-  };
-  r.onerror=()=>{btn.classList.remove('rec');btn.textContent='🎙️ سجّل';};
-  r.start();
-}
-function goExP(){navTo('exercises');setTimeout(()=>document.querySelectorAll('.etab')[2]?.click(),100);}
+
+
+
 
 // ══════════ TEST ══════════
 // Test questions with Arabic translations
@@ -2706,6 +2723,334 @@ function updateStats(){
     }).join('');
   }
 }
+
+// ══════════════════════════════════════════════════════
+// MCQ BANK — بنك أسئلة كبير (أسئلة اختيار من متعدد)
+// ══════════════════════════════════════════════════════
+const MCQ_BANK = [
+// ── A1: المفردات الطبية الأساسية ──────────────────────
+{cat:'A1 — مفردات',q:'ما معنى كلمة "le médecin"؟',opts:['الصيدلاني','الطبيب','الممرض','المريض'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "la douleur"؟',opts:['الحمى','الدواء','الألم','السعال'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "la fièvre"؟',opts:['الدوار','الحمى','الصداع','الغثيان'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "l\'ordonnance"؟',opts:['التشخيص','الروشتة','التحليل','العملية'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "le comprimé"؟',opts:['الشراب','الحقنة','القرص','المرهم'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "l\'hôpital"؟',opts:['العيادة','الصيدلية','المختبر','المستشفى'],ans:3},
+{cat:'A1 — مفردات',q:'ما معنى "la pharmacie"؟',opts:['العيادة','الصيدلية','المختبر','المستشفى'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "le traitement"؟',opts:['التشخيص','العلاج','التحليل','العملية'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "les urgences"؟',opts:['العيادة','المختبر','الطوارئ','الجراحة'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "le sang"؟',opts:['البول','الدم','اللعاب','العظم'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "la tête"؟',opts:['القلب','البطن','الرأس','الظهر'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "le ventre"؟',opts:['الرأس','الظهر','الصدر','البطن'],ans:3},
+{cat:'A1 — مفردات',q:'ما معنى "le cœur"؟',opts:['الرئة','الكلية','القلب','الكبد'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "la gorge"؟',opts:['الأنف','الأذن','الزور/الحلق','الفم'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "le dos"؟',opts:['البطن','الصدر','الظهر','الكتف'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "la main"؟',opts:['القدم','اليد','الرجل','الذراع'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "l\'allergie"؟',opts:['العدوى','الحساسية','الإصابة','الكسر'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "le médicament"؟',opts:['التشخيص','الوصفة','الدواء','التحليل'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "malade"؟',opts:['صحيح','بصحة','مريض','متعب'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "blessé"؟',opts:['مريض','مجروح','متعب','خائف'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "enceinte"؟',opts:['مريضة','حامل','متعبة','خائفة'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "le pansement"؟',opts:['الحقنة','الضمادة','المرهم','القرص'],ans:1},
+{cat:'A1 — مفردات',q:'ما معنى "la blessure"؟',opts:['المرض','الكسر','الجرح','الحرق'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "le rhume"؟',opts:['الحمى','الإنفلونزا','الزكام','السعال'],ans:2},
+{cat:'A1 — مفردات',q:'ما معنى "la toux"؟',opts:['الزكام','السعال','العطس','الأنين'],ans:1},
+
+// ── A1: القواعد ────────────────────────────────────────
+{cat:'A1 — قواعد',q:'أكمل: "Je ___ pharmacien."',opts:['es','suis','est','sommes'],ans:1},
+{cat:'A1 — قواعد',q:'أكمل: "Il ___ de la fièvre."',opts:['ai','as','a','avons'],ans:2},
+{cat:'A1 — قواعد',q:'أكمل: "Vous ___ allergique?"',opts:['suis','es','est','êtes'],ans:3},
+{cat:'A1 — قواعد',q:'أكمل: "Ils ___ hospitalisés."',opts:['suis','est','sont','êtes'],ans:2},
+{cat:'A1 — قواعد',q:'أكمل: "Nous ___ médecins."',opts:['sommes','sont','suis','êtes'],ans:0},
+{cat:'A1 — قواعد',q:'ما الأداة الصحيحة؟ "___ hôpital est loin."',opts:['Le','La','L\'','Les'],ans:2},
+{cat:'A1 — قواعد',q:'ما الأداة الصحيحة؟ "___ pharmacie est fermée."',opts:['Le','La','L\'','Les'],ans:1},
+{cat:'A1 — قواعد',q:'النفي الصحيح: "Je ___ fume ___."',opts:['ne/pas','pas/ne','ne/point','non/pas'],ans:0},
+{cat:'A1 — قواعد',q:'أكمل: "J\'___ mal à la tête."',opts:['es','ai','a','est'],ans:1},
+{cat:'A1 — قواعد',q:'ما الجمع الصحيح لـ "l\'hôpital"؟',opts:['les hôpitals','les hôpitaux','les hôpitales','les hôpitales'],ans:1},
+{cat:'A1 — قواعد',q:'أكمل: "Tu ___ malade depuis hier?"',opts:['suis','est','es','sommes'],ans:2},
+{cat:'A1 — قواعد',q:'الجملة الصحيحة:',opts:['Je suis pharmacien.','Je est pharmacien.','Je suis pharmacienne.','Moi suis pharmacien.'],ans:0},
+{cat:'A1 — قواعد',q:'بعد النفي، ما الصحيح؟ "Il n\'a pas ___ fièvre."',opts:['de la','du','de','des'],ans:2},
+{cat:'A1 — قواعد',q:'أكمل: "___ comprimés prenez-vous?"',opts:['Quel','Quelle','Combien de','Comment'],ans:2},
+{cat:'A1 — قواعد',q:'ما معنى "Depuis quand?"',opts:['كم مرة؟','منذ متى؟','لماذا؟','كيف؟'],ans:1},
+
+// ── A2: المفردات ────────────────────────────────────────
+{cat:'A2 — مفردات',q:'ما معنى "l\'antibiotique"؟',opts:['المسكن','المضاد الحيوي','مضاد الحموضة','المنوّم'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "l\'effet secondaire"؟',opts:['التأثير الرئيسي','الجرعة الزائدة','الأعراض الجانبية','التفاعل الدوائي'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "la tension artérielle"؟',opts:['نبضات القلب','درجة الحرارة','ضغط الدم','مستوى السكر'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "l\'analyse de sang"؟',opts:['تحليل البول','تحليل الدم','الأشعة','الحقنة'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "la chirurgie"؟',opts:['التمريض','العلاج الطبيعي','الجراحة','الأشعة'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "le diagnostic"؟',opts:['العلاج','التشخيص','الوقاية','التعافي'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "l\'opération"؟',opts:['الفحص','التحليل','العملية الجراحية','الحقن'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "la prescription"؟',opts:['التشخيص','الوصفة الطبية','التحليل','العلاج'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "le poids"؟',opts:['الطول','الوزن','العمر','الحجم'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "la grippe"؟',opts:['الزكام','الحمى','الإنفلونزا','الكحة'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "voie orale"؟',opts:['عن طريق الجلد','عن طريق الحقن','عن طريق الفم','عن طريق الأنف'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "à jeun"؟',opts:['بعد الأكل','مع الأكل','على معدة فاضية','قبل النوم'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "la dose"؟',opts:['المدة','الجرعة','التكرار','النوع'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "le laboratoire"؟',opts:['الصيدلية','العيادة','المختبر','المستشفى'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "la radio" (طبي)؟',opts:['الأشعة السينية','التحليل','الفحص','التصوير بالرنين'],ans:0},
+{cat:'A2 — مفردات',q:'ما معنى "le spécialiste"؟',opts:['الممرض','الطبيب العام','الأخصائي','الصيدلاني'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "chronique"؟',opts:['حاد','مؤلم','مزمن','خطير'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "aigu"؟',opts:['مزمن','خفيف','حاد','دائم'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "bénin"؟',opts:['خبيث','خطير','حميد','مزمن'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "les vertiges"؟',opts:['الغثيان','الصداع','الدوار','الإغماء'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "l\'infirmière"؟',opts:['الطبيبة','الصيدلانية','الممرضة','القابلة'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "le chirurgien"؟',opts:['طبيب عام','أخصائي الأشعة','الجراح','طبيب الأسنان'],ans:2},
+{cat:'A2 — مفردات',q:'ما معنى "la cicatrice"؟',opts:['الجرح','الندبة','الكدمة','الحرق'],ans:1},
+{cat:'A2 — مفردات',q:'ما معنى "l\'échographie"؟',opts:['الأشعة السينية','التصوير بالرنين','الموجات فوق الصوتية','المسح الضوئي'],ans:2},
+
+// ── A2: القواعد ────────────────────────────────────────
+{cat:'A2 — قواعد',q:'الماضي الصحيح: "J\'___ ce médicament hier."',opts:['ai pris','a pris','avez pris','prenais'],ans:0},
+{cat:'A2 — قواعد',q:'أكمل: "Prenez-le deux fois ___ jour."',opts:['du','au','par','de'],ans:2},
+{cat:'A2 — قواعد',q:'أكمل: "Je vais ___ au laboratoire."',opts:['à','au','aux','de'],ans:1},
+{cat:'A2 — قواعد',q:'أكمل: "Je ne prends ___ ce médicament."',opts:['pas/ne','ne/jamais','ne/plus','plus/ne'],ans:2},
+{cat:'A2 — قواعد',q:'المستقبل القريب: "Il ___ prendre ce médicament."',opts:['va','vais','vont','allez'],ans:0},
+{cat:'A2 — قواعد',q:'أكمل: "Quel médicament ___ vous?"',opts:['prend','prenez','prendre','prenons'],ans:1},
+{cat:'A2 — قواعد',q:'صيغة الأمر: "___ ce médicament deux fois par jour."',opts:['Prendre','Prenez','Prenons','Prend'],ans:1},
+{cat:'A2 — قواعد',q:'de + le = ___',opts:['du','au','des','de la'],ans:0},
+{cat:'A2 — قواعد',q:'à + les = ___',opts:['au','à la','aux','des'],ans:2},
+{cat:'A2 — قواعد',q:'أكمل: "Il est venu ___ urgences."',opts:['à','au','aux','des'],ans:2},
+{cat:'A2 — قواعد',q:'أكمل: "Il souffre ___ diabète."',opts:['à','au','du','de'],ans:2},
+{cat:'A2 — قواعد',q:'المفعول: "Ce médicament? Je ___ prends."',opts:['y','en','le','lui'],ans:2},
+{cat:'A2 — قواعد',q:'أكمل: "Avant, je ___ ce médicament chaque jour." (عادة ماضية)',opts:['prenais','ai pris','prendrai','prends'],ans:0},
+{cat:'A2 — قواعد',q:'أكمل: "Le patient ___ hospitalisé depuis lundi."',opts:['est','a','avoir','être'],ans:0},
+{cat:'A2 — قواعد',q:'أكمل: "___ la douleur persiste, consultez un médecin."',opts:['Quand','Si','Parce que','Mais'],ans:1},
+
+// ── B1: المفردات المتخصصة ─────────────────────────────
+{cat:'B1 — مفردات',q:'ما معنى "la pharmacocinétique"؟',opts:['علم الأدوية','حركية الدواء في الجسم','تأثير الدواء','تفاعل الأدوية'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "la biodisponibilité"؟',opts:['قابلية التحلل','التوافر الحيوي','الارتباط بالبروتين','حجم التوزيع'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "l\'observance"؟',opts:['المراقبة','الالتزام بالعلاج','التشخيص','الجرعة'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "la contre-indication"؟',opts:['مؤشر الاستخدام','الأعراض الجانبية','موانع الاستخدام','الجرعة الزائدة'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "le surdosage"؟',opts:['نقص الجرعة','الجرعة المناسبة','الجرعة الزائدة','الجرعة الأولى'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "la demi-vie"؟',opts:['نصف الجرعة','نصف مدة العلاج','نصف العمر الدوائي','نصف التركيز'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "le sevrage"؟',opts:['بداية العلاج','التوقف التدريجي عن دواء','زيادة الجرعة','التفاعل الدوائي'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "l\'intoxication"؟',opts:['العدوى','التسمم','الحساسية','الإصابة'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "le pronostic"؟',opts:['التشخيص','التوقع الطبي','العلاج','الوقاية'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "chronique" في سياق طبي؟',opts:['يستمر يوماً واحداً','حاد ومفاجئ','مزمن وطويل الأمد','يختفي وحده'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "la récidive"؟',opts:['الشفاء التام','عودة المرض','التحسن الجزئي','الاستقرار'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "ambulatoire"؟',opts:['في المستشفى','في المنزل','خارجي/بدون إقامة','في العيادة'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "la posologie"؟',opts:['اسم الدواء','تركيب الدواء','طريقة الجرعة والتناول','تاريخ الانتهاء'],ans:2},
+{cat:'B1 — مفردات',q:'ما معنى "le générique"؟',opts:['الدواء الأصلي','الدواء الجنيسي (الجنيريك)','الدواء التجريبي','المكمل الغذائي'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "l\'automédication"؟',opts:['وصف الطبيب','العلاج الذاتي بدون طبيب','العلاج التقليدي','العلاج الوقائي'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "la vigilance"؟',opts:['الغفلة','اليقظة والمتابعة','السرعة','الدقة'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "le placebo"؟',opts:['دواء قوي','دواء وهمي','جرعة مزدوجة','علاج طبيعي'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "la tolérance" (دوائي)؟',opts:['رفض الدواء','تقبّل الجسم للدواء','الحساسية','الإدمان'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "l\'immunité"؟',opts:['الحساسية','المناعة','العدوى','الالتهاب'],ans:1},
+{cat:'B1 — مفردات',q:'ما معنى "la pathologie"؟',opts:['العلاج','الوقاية','المرض/علم الأمراض','التشخيص'],ans:2},
+
+// ── B1: القواعد ────────────────────────────────────────
+{cat:'B1 — قواعد',q:'أكمل: "Il faut que vous ___ ce médicament." (Subjonctif)',opts:['prenez','preniez','prendrez','prendre'],ans:1},
+{cat:'B1 — قواعد',q:'أكمل: "Bien que le traitement ___ long, il est nécessaire."',opts:['est','sera','soit','était'],ans:2},
+{cat:'B1 — قواعد',q:'الشرط الصحيح: "Si vous ___ du repos, vous iriez mieux."',opts:['preniez','prenez','prendrez','pris'],ans:0},
+{cat:'B1 — قواعد',q:'أكمل: "Vous ___ prendrez ce médicament 10 jours."',opts:['vais','vas','allez','allons'],ans:2},
+{cat:'B1 — قواعد',q:'المبني للمجهول: "Le médicament ___ par le pharmacien."',opts:['délivre','est délivré','a délivré','délivrera'],ans:1},
+{cat:'B1 — قواعد',q:'أكمل: "Je vais aux urgences. → J\'___ vais."',opts:['le','la','y','en'],ans:2},
+{cat:'B1 — قواعد',q:'أكمل: "Des comprimés? J\'___ prends deux."',opts:['le','les','y','en'],ans:3},
+{cat:'B1 — قواعد',q:'أكمل: "Je parle au médecin. → Je ___ parle."',opts:['le','lui','y','en'],ans:1},
+{cat:'B1 — قواعد',q:'المقارنة: "Ce médicament est ___ efficace que l\'autre."',opts:['plus','très','aussi','tellement'],ans:0},
+{cat:'B1 — قواعد',q:'أكمل: "Pour que vous guérissiez, ___ le traitement."',opts:['observez','observiez','observer','observant'],ans:0},
+{cat:'B1 — قواعد',q:'الكلام غير المباشر: "Prenez ce médicament." → Il a dit ___',opts:['que prendre','de prendre','qu\'il prendre','prendre'],ans:1},
+{cat:'B1 — قواعد',q:'أكمل: "Il est nécessaire que le patient ___ hospitalisé."',opts:['est','sera','soit','serait'],ans:2},
+{cat:'B1 — قواعد',q:'التفضيل: "C\'est le médicament ___ efficace."',opts:['plus','le plus','très','assez'],ans:1},
+{cat:'B1 — قواعد',q:'أكمل: "S\'il avait suivi le traitement, il ___ guéri."',opts:['aurait','a','aura','avait'],ans:0},
+{cat:'B1 — قواعد',q:'أكمل: "N\'___ pas le traitement sans avis médical." (نفي الأمر)',opts:['arrête','arrêtez','arrêter','arrêtez-vous'],ans:1},
+
+// ── B2: مصطلحات متقدمة ────────────────────────────────
+{cat:'B2 — مصطلحات',q:'ما معنى "la pharmacovigilance"؟',opts:['بيع الأدوية','متابعة الآثار الجانبية بعد التسويق','إنتاج الأدوية','توزيع الأدوية'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "l\'induction enzymatique"؟',opts:['تثبيط الإنزيمات','تحريض إنزيمات الكبد','توقف الإنزيمات','إنتاج إنزيمات جديدة'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "la fenêtre thérapeutique"؟',opts:['وقت أخذ الدواء','المدى بين الجرعة الفعالة والسامة','مدة العلاج','موعد المتابعة'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "le pronostic est réservé"؟',opts:['التوقع جيد جداً','التوقع سيئ','التوقع غير محسوم','المريض تعافى'],ans:2},
+{cat:'B2 — مصطلحات',q:'ما معنى "la maladie nosocomiale"؟',opts:['مرض وراثي','مرض مزمن','عدوى مكتسبة في المستشفى','مرض مناعي'],ans:2},
+{cat:'B2 — مصطلحات',q:'ما معنى "le taux de glycémie"؟',opts:['نسبة الدهون','نسبة الحموضة','مستوى السكر في الدم','ضغط الدم'],ans:2},
+{cat:'B2 — مصطلحات',q:'ما معنى "l\'hémoglobine"؟',opts:['خلايا الدم البيضاء','الصفائح الدموية','الهيموغلوبين','البلازما'],ans:2},
+{cat:'B2 — مصطلحات',q:'ما معنى "la résistance bactérienne"؟',opts:['تكاثر البكتيريا','مقاومة البكتيريا للمضادات الحيوية','حساسية البكتيريا','إزالة البكتيريا'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "le taux de cholestérol"؟',opts:['نسبة السكر','نسبة الكوليسترول','ضغط الدم','نسبة الدهون'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "l\'immunodépression"؟',opts:['تقوية المناعة','ضعف المناعة','الحساسية المفرطة','الالتهاب'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "la morbidité"؟',opts:['معدل الوفيات','معدل الإصابة بالمرض','معدل الشفاء','معدل المضاعفات'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "iatrogène"؟',opts:['طبيعي المنشأ','وراثي','ناتج عن علاج طبي','نفسي المنشأ'],ans:2},
+{cat:'B2 — مصطلحات',q:'ما معنى "la compliance"؟',opts:['الامتثال والالتزام بالعلاج','رفض العلاج','تغيير العلاج','تأجيل العلاج'],ans:0},
+{cat:'B2 — مصطلحات',q:'ما معنى "sublingual"؟',opts:['عن طريق الجلد','تحت اللسان','عبر الأنف','عن طريق المستقيم'],ans:1},
+{cat:'B2 — مصطلحات',q:'ما معنى "la dépendance"؟',opts:['التحمل','الإدمان والاعتماد','الحساسية','الإقلاع'],ans:1},
+
+// ── B2: جمل وتعبيرات ────────────────────────────────────
+{cat:'B2 — جمل',q:'"Le patient se plaint de..." يعني:',opts:['المريض يرفض...','المريض يشتكي من...','المريض يطلب...','المريض يقبل...'],ans:1},
+{cat:'B2 — جمل',q:'"En cas d\'aggravation" يعني:',opts:['في حالة التحسن','في حالة التعافي','في حالة التفاقم','في حالة الاستقرار'],ans:2},
+{cat:'B2 — جمل',q:'"Les résultats sont inquiétants" يعني:',opts:['النتائج ممتازة','النتائج مقلقة','النتائج طبيعية','النتائج غير معتادة'],ans:1},
+{cat:'B2 — جمل',q:'"Évitez l\'automédication" يعني:',opts:['اشتري الدواء بنفسك','تجنب العلاج الذاتي','خذ جرعة مضاعفة','استشر الصيدلاني فقط'],ans:1},
+{cat:'B2 — جمل',q:'"Prenez-le à jeun" يعني:',opts:['بعد الأكل مباشرة','مع الأكل','على معدة فاضية','قبل النوم'],ans:2},
+{cat:'B2 — جمل',q:'"Ce médicament ne nécessite pas d\'ordonnance." يعني:',opts:['يحتاج روشتة','لا يحتاج روشتة','يحتاج موافقة الطبيب','ممنوع بدون طبيب'],ans:1},
+{cat:'B2 — جمل',q:'"Consultez immédiatement" يعني:',opts:['استشر لاحقاً','استشر عند الحاجة','استشر فوراً','لا حاجة للاستشارة'],ans:2},
+{cat:'B2 — جمل',q:'"N\'arrêtez pas le traitement sans avis médical." يعني:',opts:['يمكن إيقاف العلاج متى شئت','لا توقف العلاج بدون استشارة طبيب','أوقف العلاج بعد أسبوع','اسأل الصيدلاني فقط'],ans:1},
+{cat:'B2 — جمل',q:'"Bonne guérison!" يعني:',opts:['مرحباً','شكراً','سلامتك','مع السلامة'],ans:2},
+{cat:'B2 — جمل',q:'"Avez-vous des antécédents?" يعني:',opts:['عندك أعراض؟','عندك تاريخ مرضي؟','بتاخد أدوية؟','عندك حساسية؟'],ans:1},
+
+// ── صيدلة عملية ─────────────────────────────────────────
+{cat:'صيدلة — عملية',q:'المريض يقول "J\'ai mal au ventre" — ما معنى ذلك؟',opts:['عنده صداع','عنده ألم في البطن','عنده ألم في الصدر','عنده ألم في الظهر'],ans:1},
+{cat:'صيدلة — عملية',q:'المريض يقول "Je tousse beaucoup" — ما معنى ذلك؟',opts:['عنده حمى','يتقيأ','يسعل كثيراً','عنده دوار'],ans:2},
+{cat:'صيدلة — عملية',q:'تعليمات الدواء: "2 comprimés 3 fois par jour" — كم قرص في اليوم؟',opts:['٢','٣','٦','٩'],ans:2},
+{cat:'صيدلة — عملية',q:'ما معنى "après les repas"؟',opts:['قبل الأكل','أثناء الأكل','بعد الأكل','بعيداً عن الأكل'],ans:2},
+{cat:'صيدلة — عملية',q:'ما معنى "ne pas dépasser la dose prescrite"؟',opts:['خد جرعة أكبر','لا تتجاوز الجرعة المحددة','قلل الجرعة','وقف الدواء'],ans:1},
+{cat:'صيدلة — عملية',q:'ما معنى "conserver au frais"؟',opts:['احفظه في الشمس','احفظه في مكان جاف','احفظه في البراد','احفظه في مكان دافئ'],ans:2},
+{cat:'صيدلة — عملية',q:'ما معنى "date de péremption"؟',opts:['تاريخ الإنتاج','تاريخ الشراء','تاريخ الانتهاء/الصلاحية','تاريخ الفتح'],ans:2},
+{cat:'صيدلة — عملية',q:'المريض يسأل "C\'est remboursé?" — يعني:',opts:['هل هو فعال؟','هل هو رخيص؟','هل يُعاد تعويضه من التأمين؟','هل يُصرف بدون روشتة؟'],ans:2},
+{cat:'صيدلة — عملية',q:'ما معنى "per os" أو "P.O."؟',opts:['عن طريق الجلد','عن طريق الفم','عن طريق الحقن','عن طريق الاستنشاق'],ans:1},
+{cat:'صيدلة — عملية',q:'ما معنى "IV" في السياق الطبي؟',opts:['عن طريق الفم','عضلي','وريدي','تحت الجلد'],ans:2},
+{cat:'صيدلة — عملية',q:'ما معنى "IM" في السياق الطبي؟',opts:['وريدي','عضلي','تحت الجلد','عن طريق الفم'],ans:1},
+{cat:'صيدلة — عملية',q:'ما معنى "SC" أو "sous-cutané"؟',opts:['وريدي','عضلي','تحت الجلد','عن طريق الفم'],ans:2},
+{cat:'صيدلة — عملية',q:'ما المقصود بـ "traitement de fond"؟',opts:['علاج عرضي مؤقت','علاج الطوارئ','علاج قاعدي ومستمر','جرعة واحدة'],ans:2},
+{cat:'صيدلة — عملية',q:'"Ne pas avaler" يعني:',opts:['ابتلع الدواء','لا تبتلع الدواء (أذب تحت اللسان)','خذ مع الماء','احسّ به ببطء'],ans:1},
+];
+
+// ══ MCQ State ══
+let mcqAll=[], mcqFiltered=[], mcqIdx=0, mcqScore=0, mcqAnswered=false;
+let mcqCategory='all';
+
+function initMCQ(){
+  mcqAll=[...MCQ_BANK].sort(()=>Math.random()-.5);
+  mcqFiltered=mcqAll;
+  mcqIdx=0; mcqScore=0; mcqAnswered=false;
+  renderMCQContainer();
+}
+
+function renderMCQContainer(){
+  const c=document.getElementById('mcq-container');
+  if(!c)return;
+  // Get unique categories
+  const cats=['all',...new Set(MCQ_BANK.map(q=>q.cat))];
+  c.innerHTML=`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;gap:5px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none">
+        ${cats.map(cat=>`<button onclick="filterMCQ('${cat}',this)"
+          style="padding:5px 11px;border-radius:17px;border:1.5px solid var(--border);
+          background:${cat===mcqCategory?'var(--navy)':'var(--card)'};
+          color:${cat===mcqCategory?'#fff':'var(--muted)'};
+          font-family:Tajawal,sans-serif;font-size:.72rem;font-weight:600;
+          white-space:nowrap;flex-shrink:0;cursor:pointer">
+          ${cat==='all'?'الكل 📚':cat}
+        </button>`).join('')}
+      </div>
+      <div style="background:var(--border);border-radius:10px;height:6px;overflow:hidden;margin-bottom:6px">
+        <div id="mcq-bar" style="height:100%;background:linear-gradient(90deg,var(--blue2),var(--red));border-radius:10px;transition:width .4s;width:0%"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:.72rem;color:var(--muted)">
+        <span id="mcq-counter">سؤال ١ / ${mcqFiltered.length}</span>
+        <span>✅ <span id="mcq-score">٠</span></span>
+      </div>
+    </div>
+    <div id="mcq-qwrap"></div>`;
+  renderMCQQuestion();
+}
+
+function filterMCQ(cat, btn){
+  mcqCategory=cat;
+  mcqFiltered=cat==='all'?[...MCQ_BANK].sort(()=>Math.random()-.5):
+    MCQ_BANK.filter(q=>q.cat===cat).sort(()=>Math.random()-.5);
+  mcqIdx=0; mcqScore=0; mcqAnswered=false;
+  // Update button styles
+  btn.closest('div').querySelectorAll('button').forEach(b=>{
+    b.style.background='var(--card)';b.style.color='var(--muted)';
+  });
+  btn.style.background='var(--navy)';btn.style.color='#fff';
+  // Update counter
+  document.getElementById('mcq-counter').textContent=`سؤال ١ / ${AN(mcqFiltered.length)}`;
+  document.getElementById('mcq-bar').style.width='0%';
+  document.getElementById('mcq-score').textContent='٠';
+  renderMCQQuestion();
+}
+
+function renderMCQQuestion(){
+  const wrap=document.getElementById('mcq-qwrap');
+  if(!wrap)return;
+  if(mcqIdx>=mcqFiltered.length){
+    const pct=Math.round(mcqScore/mcqFiltered.length*100);
+    const medal=pct>=90?'🏆':pct>=70?'🌟':pct>=50?'👍':'📚';
+    wrap.innerHTML=`
+      <div style="background:var(--card);border-radius:14px;padding:24px 16px;text-align:center;border:1px solid var(--border)">
+        <div style="font-size:2.5rem;margin-bottom:10px">${medal}</div>
+        <div style="font-family:Outfit,sans-serif;font-size:1.2rem;font-weight:900;margin-bottom:6px">
+          ${AN(mcqScore)} / ${AN(mcqFiltered.length)}
+        </div>
+        <div style="font-size:.84rem;color:var(--muted);margin-bottom:16px">
+          نسبة الإجابة الصحيحة: ${AN(pct)}٪
+        </div>
+        <button onclick="initMCQ()" style="padding:11px 24px;border-radius:10px;background:var(--navy);color:#fff;border:none;font-family:Tajawal,sans-serif;font-size:.88rem;font-weight:700;cursor:pointer">
+          🔄 جولة جديدة
+        </button>
+      </div>`;
+    return;
+  }
+  mcqAnswered=false;
+  const q=mcqFiltered[mcqIdx];
+  const total=mcqFiltered.length;
+  // Update progress
+  const barEl=document.getElementById('mcq-bar');
+  const ctrEl=document.getElementById('mcq-counter');
+  const sEl=document.getElementById('mcq-score');
+  if(barEl)barEl.style.width=(mcqIdx/total*100)+'%';
+  if(ctrEl)ctrEl.textContent=`سؤال ${AN(mcqIdx+1)} / ${AN(total)}`;
+  if(sEl)sEl.textContent=AN(mcqScore);
+
+  wrap.innerHTML=`
+    <div style="background:var(--card);border-radius:13px;border:1px solid var(--border);padding:16px;box-shadow:var(--sh)">
+      <div style="display:inline-block;padding:2px 9px;border-radius:17px;background:var(--light);color:var(--blue);font-size:.65rem;font-weight:700;margin-bottom:8px">${q.cat}</div>
+      <div style="font-size:.95rem;font-weight:700;margin-bottom:14px;line-height:1.5;direction:${/[\u0600-\u06FF]/.test(q.q)?'rtl':'ltr'}">${q.q}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px" id="mcq-opts">
+        ${q.opts.map((o,i)=>`
+          <button onclick="answerMCQ(${i})"
+            id="mcq-opt-${i}"
+            style="padding:11px 10px;background:var(--card);border:1.5px solid var(--border);
+            border-radius:9px;font-size:.82rem;color:var(--text);cursor:pointer;
+            font-family:Tajawal,sans-serif;font-weight:500;
+            line-height:1.4;transition:all .15s;
+            direction:${/[\u0600-\u06FF]/.test(o)?'rtl':'ltr'}">
+            ${o}
+          </button>`).join('')}
+      </div>
+      <div id="mcq-fb" style="display:none;margin-top:12px;padding:10px 13px;border-radius:9px;font-size:.84rem;text-align:center"></div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px">
+        <button id="mcq-next-btn" onclick="nextMCQ()" style="display:none;padding:8px 20px;border-radius:17px;background:var(--navy);color:#fff;border:none;font-family:Tajawal,sans-serif;font-size:.82rem;font-weight:700;cursor:pointer">
+          التالي ←
+        </button>
+      </div>
+    </div>`;
+}
+
+function answerMCQ(idx){
+  if(mcqAnswered)return;
+  mcqAnswered=true;
+  const q=mcqFiltered[mcqIdx];
+  const ok=idx===q.ans;
+  if(ok)mcqScore++;
+  // Color options
+  for(let i=0;i<q.opts.length;i++){
+    const btn=document.getElementById('mcq-opt-'+i);
+    if(!btn)continue;
+    btn.style.cursor='default';btn.style.pointerEvents='none';
+    if(i===q.ans){btn.style.background='#f0fdf4';btn.style.border='1.5px solid #059669';btn.style.color='#166534';btn.style.fontWeight='700';}
+    else if(i===idx&&!ok){btn.style.background='#fef2f2';btn.style.border='1.5px solid #dc2626';btn.style.color='#991b1b';}
+  }
+  // Feedback
+  const fb=document.getElementById('mcq-fb');
+  if(fb){
+    fb.style.display='block';
+    if(ok){fb.style.background='#f0fdf4';fb.style.color='#166534';fb.style.border='1px solid #bbf7d0';fb.textContent='✅ إجابة صحيحة!';}
+    else{fb.style.background='#fef2f2';fb.style.color='#991b1b';fb.style.border='1px solid #fecaca';fb.textContent='❌ الإجابة الصحيحة: '+q.opts[q.ans];}
+  }
+  const nb=document.getElementById('mcq-next-btn');
+  if(nb)nb.style.display='inline-block';
+  // Update score display
+  const sEl=document.getElementById('mcq-score');
+  if(sEl)sEl.textContent=AN(mcqScore);
+}
+
+function nextMCQ(){
+  mcqIdx++;
+  // Update progress bar
+  const total=mcqFiltered.length;
+  const barEl=document.getElementById('mcq-bar');
+  if(barEl)barEl.style.width=(mcqIdx/total*100)+'%';
+  renderMCQQuestion();
+}
+
 </script>
 </body>
 </html>
