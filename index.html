@@ -727,7 +727,7 @@ input,select{font-family:'Tajawal',sans-serif;}
     <div class="fcard" onclick="navTo('vocab')"><div class="fico">📚</div><div class="fname">٣٥٠٠+ كلمة</div><div class="fdesc">مع نطق ومذكر/مؤنث</div><span class="fbadge bcore">الأساسي</span></div>
     <div class="fcard" onclick="navTo('grammar')"><div class="fico">📖</div><div class="fname">قواعد A1→C2</div><div class="fdesc">٣٠+ درس مع تمارين</div><span class="fbadge bcore">الأساسي</span></div>
     <div class="fcard" onclick="navTo('flash')"><div class="fico">🔄</div><div class="fname">بطاقات ذكية</div><div class="fdesc">مراجعة متكررة</div><span class="fbadge bhot">مميز</span></div>
-    <div class="fcard" onclick="navTo('exercises')"><div class="fico">✍️</div><div class="fname">تمارين</div><div class="fdesc">ملء فراغات وترجمة</div><span class="fbadge bnew">جديد</span></div>
+    <div class="fcard" onclick="navTo('exercises')"><div class="fico">✍️</div><div class="fname">تمارين + نطق</div><div class="fdesc">ملء فراغات وترجمة</div><span class="fbadge bnew">جديد</span></div>
     <div class="fcard" onclick="navTo('test')"><div class="fico">🎯</div><div class="fname">تحديد المستوى</div><div class="fdesc">٤٠ سؤال مع ترجمة</div><span class="fbadge bhot">مميز</span></div>
     <div class="fcard" onclick="navTo('ai')"><div class="fico">🤖</div><div class="fname">مساعد AI</div><div class="fdesc">يحدد ناقصك ويوجهك</div><span class="fbadge bai">AI</span></div>
   </div>
@@ -1142,6 +1142,36 @@ async function doLogin(){
     setLoad('li-btn',false,'دخول');
   }
 }
+
+async function doRegister(){
+  const name=$('rg-n').value.trim();
+  const email=$('rg-e').value.trim();
+  const pass=$('rg-p').value;
+  if(!name||!email||!pass){setMsg('rg-msg','من فضلك اكمل البيانات');return;}
+  if(pass.length<8){setMsg('rg-msg','❌ كلمة المرور ٨ أحرف على الأقل');return;}
+  setLoad('rg-btn',true,'جاري...');
+  try{
+    const{data,error}=await sb.auth.signUp({
+      email,
+      password:pass,
+      options:{data:{full_name:name}}
+    });
+    if(error){setMsg('rg-msg',trErr(error.message));return;}
+    // Try auto-login immediately
+    setMsg('rg-msg','✅ تم إنشاء الحساب! جاري تسجيل الدخول...','ok');
+    setTimeout(async()=>{
+      try{
+        const{error:le}=await sb.auth.signInWithPassword({email,password:pass});
+        if(le)setMsg('rg-msg','✅ الحساب اتعمل! سجّل دخولك الآن.','ok');
+      }catch(e){}
+    },800);
+  }catch(e){
+    setMsg('rg-msg','❌ تحقق من اتصالك بالإنترنت');
+  }finally{
+    setLoad('rg-btn',false,'إنشاء الحساب');
+  }
+}
+
 
 async function doForgot(e){
   e.preventDefault();
